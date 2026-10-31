@@ -7,6 +7,7 @@ from app import models  # Register all six tables before create_all.
 from app.api import audit, debug, findings, quick_check, scans, sites
 from app.config import settings
 from app.db import Base, engine
+from app.replay import router as replay_router
 from app.schemas import ErrorResponse, HealthResponse
 
 
@@ -40,6 +41,7 @@ for router in (quick_check.router, sites.router, scans.router, findings.router, 
 
 
 app.include_router(debug.router)
+app.include_router(replay_router)
 
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
