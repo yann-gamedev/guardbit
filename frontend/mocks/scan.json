@@ -1,0 +1,58 @@
+{
+  "scan_id": "scn_01",
+  "site_alias": "Kampus A",
+  "status": "done",
+  "started_at": "2026-10-31T16:05:00+07:00",
+  "finished_at": "2026-10-31T16:07:30+07:00",
+  "summary": { "pages": 6, "terinfeksi": 1, "waspada": 2, "tidak_dapat_diperiksa": 1 },
+  "pages": [
+    {
+      "page_id": "pg_07",
+      "url": "https://kampus-a.example/berita/123",
+      "r_score": 0.93,
+      "label": "terinfeksi",
+      "triggers": ["L2:display_none", "L3:prob=0.97", "L1:crawler_only_hosts=14"],
+      "finding_id": "fnd_12"
+    },
+    {
+      "page_id": "pg_08",
+      "url": "https://kampus-a.example/berita/124",
+      "r_score": 0.55,
+      "label": "waspada",
+      "triggers": ["L3:prob=0.55"],
+      "finding_id": "fnd_13"
+    },
+    {
+      "page_id": "pg_09",
+      "url": "https://kampus-a.example/pengumuman",
+      "r_score": 0.48,
+      "label": "waspada",
+      "triggers": ["L4:foreign_host_ratio=0.42"],
+      "finding_id": "fnd_14"
+    },
+    {
+      "page_id": "pg_10",
+      "url": "https://kampus-a.example/",
+      "r_score": 0.02,
+      "label": "aman",
+      "triggers": [],
+      "finding_id": null
+    },
+    {
+      "page_id": "pg_11",
+      "url": "https://kampus-a.example/profil",
+      "r_score": 0.05,
+      "label": "aman",
+      "triggers": [],
+      "finding_id": null
+    },
+    {
+      "page_id": "pg_12",
+      "url": "https://kampus-a.example/arsip",
+      "r_score": 0,
+      "label": "tidak_dapat_diperiksa",
+      "triggers": ["L1:blocked"],
+      "finding_id": null
+    }
+  ]
+}

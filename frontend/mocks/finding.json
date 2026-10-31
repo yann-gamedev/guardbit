@@ -1,0 +1,19 @@
+{
+  "finding_id": "fnd_12",
+  "page_id": "pg_07",
+  "url": "https://kampus-a.example/berita/123",
+  "label": "terinfeksi",
+  "r_score": 0.93,
+  "layers": {
+    "L1": { "status": "partial", "score": 0.0, "evidence": [{ "profile": "crawler", "note": "profil diblokir (403)" }] },
+    "L2": { "status": "ok", "score": 0.95, "evidence": [
+      { "selector": "body > div:nth-of-type(1)", "reason": "display_none", "link_count": 11, "snippet": "slot gacor [DISENSOR] situs toto [DISENSOR]" }
+    ] },
+    "L3": { "status": "ok", "score": 0.97, "evidence": [
+      { "selector": "body > div:nth-of-type(1)", "prob": 0.97, "top_ngrams": ["slot", "gacor", "toto"] }
+    ] },
+    "L4": { "status": "ok", "score": 0.6, "evidence": [{ "foreign_host_ratio": 0.42, "note": "rasio host asing di atas median situs" }] }
+  },
+  "screenshots": { "browser": "/snapshots/scn_01/pg_07/browser_1.png" },
+  "checked_at": "2026-10-31T16:06:10+07:00"
+}
