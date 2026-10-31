@@ -56,9 +56,7 @@ Sebelum Challenge Brief dirilis, tim hanya menyiapkan riset, proposal, dan dokum
 
 | Alat AI | Dipakai untuk | Bagian |
 | --- | --- | --- |
-| OpenCode (model vibing1 melalui 9router) | Bantuan pembuatan skeleton backend dan test kontrak; 58 test lulus pada lingkungan lokal, tinjauan tim tetap diperlukan | `backend/` |
 | TODO (API LLM) | Fitur produk: penjelasan temuan dan panduan perbaikan | `backend/app/remediation` |
-| Skill agent pihak ketiga: caveman (Apache-2.0), ponytail (MIT), hallmark (MIT) | Mengatur gaya jawaban, disiplin perubahan kode, dan desain dasbor agent; tidak disertakan di repo | Seluruh repo |
 
 Keputusan deteksi (status Aman/Waspada/Terinfeksi) tidak memakai LLM.
 
