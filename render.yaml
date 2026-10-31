@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: guardbit-backend
+    runtime: docker
+    region: singapore
+    plan: 1c-2g # 2 GB RAM; paid plan, Free/512 MB does not meet the minimum.
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: DEBUG
+        sync: false # Enter true for smoke testing, then false after verification.
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        sync: false # postgresql+psycopg://...; credentials stay in Render.

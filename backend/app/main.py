@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # Register all six tables before create_all.
-from app.api import audit, findings, quick_check, scans, sites
+from app.api import audit, debug, findings, quick_check, scans, sites
 from app.config import settings
 from app.db import Base, engine
 from app.schemas import ErrorResponse, HealthResponse
@@ -37,6 +37,9 @@ for router in (quick_check.router, sites.router, scans.router, findings.router, 
             for code in (400, 401, 403, 404, 429, 501)
         },
     )
+
+
+app.include_router(debug.router)
 
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
