@@ -1,0 +1,15 @@
+.env
+.env.*
+.venv/
+.python/
+.uv-cache/
+.pytest_cache/
+**/__pycache__/
+**/*.pyc
+*.db
+*.db-*
+*.sqlite*
+snapshots/
+*.log
+.git/
+tests/

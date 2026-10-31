@@ -1,0 +1,46 @@
+# Rahasia
+.env
+.env.*
+!.env.example
+
+# Data mentah: snapshot situs temuan berisi domain asli dan tautan judol aktif
+data/snapshots/
+data/raw/
+*.har
+
+# Model besar
+ml/artifacts/*.joblib
+ml/artifacts/*.bin
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+.next/
+out/
+.vercel/
+
+# Playwright
+test-results/
+playwright-report/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Lokal saja, jangan di-push: konfigurasi agent dan dokumen kerja tim
+.agents/
+docs/skills/
+docs/skills.md
+*.md
+!README.md
