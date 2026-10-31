@@ -61,12 +61,12 @@ def test_docs_and_openapi(client):
 
 def test_cors_allows_configured_origin_only(client):
     allowed = client.options("/quick-check", headers={
-        "Origin": settings.FRONTEND_ORIGIN,
+        "Origin": settings.FRONTEND_ORIGIN.split(",")[0],
         "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "content-type",
     })
     assert allowed.status_code == 200
-    assert allowed.headers["access-control-allow-origin"] == settings.FRONTEND_ORIGIN
+    assert allowed.headers["access-control-allow-origin"] == settings.FRONTEND_ORIGIN.split(",")[0]
     denied = client.get("/health", headers={"Origin": "https://other.example"})
     assert "access-control-allow-origin" not in denied.headers
 

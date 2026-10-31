@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="GuardBit", version="0.1.0", debug=settings.DEBUG, lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_ORIGIN],
+    allow_origins=settings.FRONTEND_ORIGIN.split(","),
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
