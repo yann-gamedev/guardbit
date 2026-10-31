@@ -1,0 +1,7 @@
+{
+  "site_id": "ste_01",
+  "domain": "kampus-a.example",
+  "token": "3f9c2a7e1b4d8f60a5c3e9d2b7f1a4c8",
+  "verify_path": "/.well-known/guardbit-3f9c2a7e1b4d8f60a5c3e9d2b7f1a4c8.txt",
+  "verified": false
+}
