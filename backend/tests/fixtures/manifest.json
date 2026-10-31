@@ -1,0 +1,42 @@
+{
+  "css_hidden": {
+    "default": "default.html", "crawler": null, "search": null, "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["css_hidden"]}
+  },
+  "offscreen": {
+    "default": "default.html", "crawler": null, "search": null, "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["offscreen"]}
+  },
+  "tiny_white": {
+    "default": "default.html", "crawler": null, "search": null, "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["tiny_white"]}
+  },
+  "cloak_ua": {
+    "default": "default.html", "crawler": "crawler.html", "search": null, "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["cloak_ua"]}
+  },
+  "cloak_referer": {
+    "default": "default.html", "crawler": null, "search": "search.html", "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["cloak_referer"]}
+  },
+  "js_redirect": {
+    "default": "default.html", "crawler": null, "search": "search.html", "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["js_redirect"]}
+  },
+  "obfuscated": {
+    "default": "default.html", "crawler": null, "search": null, "crawler_status": 200,
+    "expected": {"label": "Terinfeksi", "teknik": ["obfuscated"]}
+  },
+  "clean": {
+    "default": "default.html", "crawler": null, "search": null, "crawler_status": 200,
+    "expected": {"label": "Aman", "teknik": []}
+  },
+  "hardneg_news": {
+    "default": "default.html", "crawler": null, "search": null, "crawler_status": 200,
+    "expected": {"label": "Aman", "teknik": []}
+  },
+  "blocked_crawler": {
+    "default": "default.html", "crawler": "crawler.html", "search": null, "crawler_status": 403,
+    "expected": {"label": "Tidak dapat diperiksa", "teknik": ["blocked_crawler"]}
+  }
+}
