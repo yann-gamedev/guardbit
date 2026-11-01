@@ -75,14 +75,10 @@ def test_contract_example_validates_without_shape_changes(model, payload):
     assert model.model_validate(payload).model_dump(mode="json") == payload
 
 
-@pytest.mark.parametrize("method,path", [entry for entry in ENDPOINTS if entry[1] != "/health"])
+@pytest.mark.parametrize("method,path", [entry for entry in ENDPOINTS if entry[1] not in {"/health", "/quick-check"}])
 def test_unimplemented_endpoints_return_501(client, method, path):
     url = path.format(site_id="ste_01", scan_id="scn_01", finding_id="fnd_12")
-    payload = (
-        {"url": "https://kampus-a.example/"} if path == "/quick-check"
-        else {"domain": "kampus-a.example"} if path == "/sites"
-        else None
-    )
+    payload = {"domain": "kampus-a.example"} if path == "/sites" else None
     response = client.request(method, url, json=payload)
     assert response.status_code == 501
     assert response.json() == {"detail": "Belum diimplementasikan"}

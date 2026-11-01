@@ -51,10 +51,14 @@ def local_site():
                 body = body.replace("Halaman normal", "Tunggu sebentar...")
             elif path == "/status":
                 status = int(parse_qs(urlsplit(self.path).query)["code"][0])
+            elif path == "/external-css":
+                body = '<link rel="stylesheet" href="/hidden.css"><div class="concealed"><a href="https://other.invalid/">slot gacor maxwin</a></div>'
+            elif path == "/hidden.css":
+                body = '.concealed { display: none; }'
             elif path == "/resources":
                 body = body.replace("</body>", '<img src="https://other.invalid/image.png"></body>')
             self.send_response(status)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Type", "text/css" if path == "/hidden.css" else "text/html; charset=utf-8")
             if location:
                 self.send_header("Location", location)
             self.end_headers()
