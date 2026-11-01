@@ -17,7 +17,7 @@ export class ApiError extends Error {
   }
 }
 
-function useMocks() {
+export function mocksEnabled() {
   const value = process.env.NEXT_PUBLIC_USE_MOCKS ?? "true";
   if (value !== "true" && value !== "false") {
     throw new Error("NEXT_PUBLIC_USE_MOCKS harus true atau false.");
@@ -26,7 +26,7 @@ function useMocks() {
 }
 
 async function request<T>(path: string, schema: z.ZodType<T>, mock: () => unknown, body?: unknown, method = "GET"): Promise<T> {
-  if (useMocks()) return schema.parse(structuredClone(mock()));
+  if (mocksEnabled()) return schema.parse(structuredClone(mock()));
 
   const base = process.env.NEXT_PUBLIC_API_URL;
   if (!base) throw new Error("NEXT_PUBLIC_API_URL wajib diisi saat mock dinonaktifkan.");

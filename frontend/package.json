@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/api.test.ts",
+    "test": "node --experimental-strip-types --test tests/api.test.ts tests/quick-check.test.ts",
     "test:routes": "node tests/routes.mjs"
   },
   "dependencies": {
