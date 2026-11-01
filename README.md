@@ -71,7 +71,7 @@ Keputusan deteksi (status Aman/Waspada/Terinfeksi) tidak memakai LLM.
 
 ### Library dan layanan pihak ketiga
 
-Dependensi langsung skeleton backend (versi dipin di `backend/requirements.txt`): FastAPI, Uvicorn, SQLAlchemy, Pydantic, pydantic-settings, HTTPX, Playwright, APScheduler, pytest, dan pytest-asyncio. Image Docker: `mcr.microsoft.com/playwright/python:v1.64.1-noble`, dengan paket `playwright==1.64.1`.
+Dependensi langsung skeleton backend (versi dipin di `backend/requirements.txt`): FastAPI, Uvicorn, SQLAlchemy, Pydantic, pydantic-settings, HTTPX, HTTPX2 (transport TestClient Starlette; HTTPX tetap untuk transport publik), Playwright, APScheduler, pytest, dan pytest-asyncio. Image Docker: `mcr.microsoft.com/playwright/python:v1.64.1-noble`, dengan paket `playwright==1.64.1`.
 
 Build Docker belum diverifikasi karena Docker CLI belum tersedia. Detektor, crawler, scheduler, dan integrasi LLM belum diimplementasikan; endpoint selain health masih HTTP 501. Test kontrak membaca dokumen internal `docs/plan/prompts/kontrak.md` yang tidak dipublikasikan, sehingga checkout publik belum bisa menjalankan seluruh test tanpa salinan kontrak dari tim.
 

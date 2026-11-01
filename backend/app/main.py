@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import models  # Register all six tables before create_all.
 from app.api import audit, debug, findings, quick_check, scans, sites
 from app.config import settings
+from app.crawl.fetcher import BrowserPool
 from app.db import Base, engine
 from app.replay import router as replay_router
 from app.schemas import ErrorResponse, HealthResponse
@@ -15,10 +16,16 @@ from app.schemas import ErrorResponse, HealthResponse
 async def lifespan(app: FastAPI):
     # shortcut: create missing tables only; add migrations before changing persisted schemas.
     Base.metadata.create_all(bind=engine)
+    app.state.pool = BrowserPool()
+    app.state.quick_check_cache = {}
     try:
+        await app.state.pool.start()
         yield
     finally:
-        engine.dispose()
+        try:
+            await app.state.pool.stop()
+        finally:
+            engine.dispose()
 
 
 app = FastAPI(title="GuardBit", version="0.1.0", debug=settings.DEBUG, lifespan=lifespan)

@@ -8,6 +8,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
+import httpx
+
 from playwright.async_api import (
     Browser,
     Error,
@@ -141,13 +143,19 @@ def _network_reason(error: Error) -> str | None:
     return None
 
 
-async def fetch(pool: BrowserPool, url: str, profile: str, out_dir: str | Path) -> FetchResult:
+async def fetch(
+    pool: BrowserPool, url: str, profile: str, out_dir: str | Path | None,
+    *, public_only: bool = False,
+) -> FetchResult:
     target = _host(url)
     if profile not in PROFILES:
         raise ValueError("Unknown fetch profile")
     if pool.browser is None:
         raise RuntimeError("BrowserPool.start() must be called before fetch")
     result = FetchResult(url=url, profile=profile, final_url=url)
+    # Public checks use pinned HTTP transport for every request; Chromium never connects directly.
+    if public_only:
+        from app.crawl.public_http import get_public
     context = await pool.browser.new_context(**PROFILES[profile], service_workers="block")
     route_errors: list[Error] = []
     pending_navigation: list[str] = []
@@ -156,6 +164,9 @@ async def fetch(pool: BrowserPool, url: str, profile: str, out_dir: str | Path) 
         request = route.request
         navigation = request.is_navigation_request() and request.frame.parent_frame is None
         current = request.url
+        if public_only and (request.method != "GET" or (request.resource_type == "document" and not navigation)):
+            await route.abort()
+            return
         for hop in range(6):
             try:
                 host = _host(current)
@@ -173,6 +184,25 @@ async def fetch(pool: BrowserPool, url: str, profile: str, out_dir: str | Path) 
                 # Browser redirect hops bypass routing; restart an approved navigation instead.
                 pending_navigation.append(current)
                 await route.fulfill(status=200, content_type="text/html", body="")
+                return
+            if public_only:
+                try:
+                    await pool.throttle.wait(host)
+                    response = await get_public(current, request.headers)
+                    location = response.headers.get("location")
+                    if response.status_code in REDIRECT_STATUSES and location:
+                        current = urljoin(current, location)
+                        continue
+                    await route.fulfill(
+                        status=response.status_code, body=response.content,
+                        headers={k: v for k, v in response.headers.items() if k.lower() not in {
+                            "content-encoding", "content-length", "transfer-encoding", "set-cookie",
+                        }},
+                    )
+                except (ValueError, OSError, httpx.HTTPError):
+                    if navigation:
+                        result.block_reason = "network"
+                    await route.abort()
                 return
             await pool.throttle.wait(host)
             try:
@@ -205,14 +235,24 @@ async def fetch(pool: BrowserPool, url: str, profile: str, out_dir: str | Path) 
         try:
             for hop in range(6):
                 await pool.throttle.wait(_host(current))
-                response = await context.request.get(current, max_redirects=0, timeout=30_000)
-                try:
-                    result.status = response.status
+                if public_only:
+                    response = await get_public(current, {
+                        "User-Agent": PROFILES[profile]["user_agent"],
+                        **PROFILES[profile]["extra_http_headers"],
+                    })
+                    result.status = response.status_code
                     result.final_url = current
-                    result.raw_html = await response.text()
+                    result.raw_html = response.text
                     location = response.headers.get("location")
-                finally:
-                    await response.dispose()
+                else:
+                    response = await context.request.get(current, max_redirects=0, timeout=30_000)
+                    try:
+                        result.status = response.status
+                        result.final_url = current
+                        result.raw_html = await response.text()
+                        location = response.headers.get("location")
+                    finally:
+                        await response.dispose()
                 if result.status not in REDIRECT_STATUSES or not location:
                     break
                 destination = urljoin(current, location)
@@ -249,6 +289,23 @@ async def fetch(pool: BrowserPool, url: str, profile: str, out_dir: str | Path) 
                     break
                 await page.wait_for_timeout(2_500)
                 result.final_url = page.url
+                if public_only:
+                    # Freeze visibility styles before inert L2 replay (linked CSS will be blocked).
+                    await page.evaluate("""() => {
+                        const nodes = new Set();
+                        for (const a of document.querySelectorAll('a[href]')) {
+                            for (let e = a; e; e = e.parentElement) nodes.add(e);
+                        }
+                        const properties = ['display', 'visibility', 'opacity', 'font-size', 'color',
+                            'background-color', 'position', 'left', 'top', 'width', 'height', 'transform'];
+                        const styles = [...nodes].map(e => {
+                            const s = getComputedStyle(e);
+                            return [e, properties.map(p => [p, s.getPropertyValue(p)])];
+                        });
+                        for (const [e, values] of styles) {
+                            for (const [p, v] of values) e.style.setProperty(p, v, 'important');
+                        }
+                    }""")
                 result.rendered_html = await page.content()
                 result.title = await page.title()
             except Error as error:
@@ -264,25 +321,28 @@ async def fetch(pool: BrowserPool, url: str, profile: str, out_dir: str | Path) 
                     raise route_errors[0]
                 result.block_reason = result.block_reason or reason
 
-        output = Path(out_dir)
-        output.mkdir(parents=True, exist_ok=True)
-        screenshot = output / f"{profile}_{time.time_ns()}.png"
-        if result.redirect_attempts or page.url.startswith("chrome-error://") or result.block_reason:
+        inert_needed = result.redirect_attempts or page.url.startswith("chrome-error://") or result.block_reason
+        if inert_needed:
             result.rendered_html = result.raw_html
-            await page.close()
-            # No live resources: raw HTML may contain scripts, refreshes, frames, or remote CSS.
-            inert = await pool.browser.new_context(java_script_enabled=False, service_workers="block")
-            try:
-                await inert.route("**/*", lambda route: route.abort())
-                preview = await inert.new_page()
-                await preview.set_content(result.raw_html, wait_until="domcontentloaded")
-                result.title = await preview.title()
-                await preview.screenshot(path=str(screenshot), full_page=True)
-            finally:
-                await inert.close()
-        else:
-            await page.screenshot(path=str(screenshot), full_page=True)
-        result.screenshot_path = str(screenshot)
+        if out_dir is not None:
+            output = Path(out_dir)
+            output.mkdir(parents=True, exist_ok=True)
+            screenshot = output / f"{profile}_{time.time_ns()}.png"
+            if inert_needed:
+                await page.close()
+                # No live resources: raw HTML may contain scripts, refreshes, frames, or remote CSS.
+                inert = await pool.browser.new_context(java_script_enabled=False, service_workers="block")
+                try:
+                    await inert.route("**/*", lambda route: route.abort())
+                    preview = await inert.new_page()
+                    await preview.set_content(result.raw_html, wait_until="domcontentloaded")
+                    result.title = await preview.title()
+                    await preview.screenshot(path=str(screenshot), full_page=True)
+                finally:
+                    await inert.close()
+            else:
+                await page.screenshot(path=str(screenshot), full_page=True)
+            result.screenshot_path = str(screenshot)
         if result.status in {403, 429, 503}:
             result.block_reason = f"http_{result.status}"
         elif CHALLENGE.search(result.title):
