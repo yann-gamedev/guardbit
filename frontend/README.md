@@ -4,6 +4,8 @@ Next.js App Router, TypeScript strict, Tailwind CSS. Halaman `/` (Cek Cepat, F2-
 
 Cek Cepat saat mock aktif: URL berisi `aman` → Aman, `blokir` → Tidak dapat diperiksa, lainnya → Terindikasi, dengan jeda 1,5 detik. Validasi URL ada di `lib/quick-check.ts`.
 
+Hasil pemindaian `/scan/[id]` (F2-I2) saat mock aktif: `scn_01` selesai, `scn_running` berjalan lalu selesai setelah 2 polling (3 detik), `scn_failed` gagal, `scn_kosong` 0 halaman, ID lain → tidak ditemukan. Filter label disimpan di `?label=`. Urutan, path, dan skenario mock ada di `lib/scan.ts`; peta pemicu L1–L4 di `lib/labels.ts`.
+
 ## Lokal
 
 Gunakan Node.js 22.13+ (Vercel: Node.js 22.x).
@@ -31,7 +33,7 @@ Sumber kebenaran: `docs/plan/prompts/kontrak.md` di root repo. `lib/types.ts` me
 
 `lib/api.ts` mengekspor `getHealth`, `quickCheck`, `createSite`, `verifySite`, `startScan`, `getScan`, `getFinding`, `getRemediation`, `getAuditLog`. Default `NEXT_PUBLIC_USE_MOCKS=true`, tanpa request jaringan. `quickCheck({ url }, "aman" | "terindikasi" | "tidak_dapat_diperiksa")` memilih skenario fixture; argumen kedua tidak dikirim ke API nyata. Default skenario `terindikasi`.
 
-`sites.json` adalah objek respons **POST /sites**, bukan daftar dari endpoint rekaan GET /sites. Kontrak belum mengatur login atau daftar situs. Detail mock tersedia untuk `scn_01` dan `fnd_12`; ID lain menghasilkan `ApiError(404)`, termasuk `fnd_13`/`fnd_14` yang hanya contoh baris scan. Screenshot hanya path kontrak, tidak ada berkas gambar. Mock tidak menyimpan perubahan verifikasi atau scan.
+`sites.json` adalah objek respons **POST /sites**, bukan daftar dari endpoint rekaan GET /sites. Kontrak belum mengatur login atau daftar situs. Detail mock tersedia untuk `scn_01` (plus skenario scan di atas) dan `fnd_12`; ID lain menghasilkan `ApiError(404)`, termasuk `fnd_13`/`fnd_14` yang hanya contoh baris scan. Screenshot hanya path kontrak, tidak ada berkas gambar. Mock tidak menyimpan perubahan verifikasi atau scan.
 
 Untuk backend nyata, salin `.env.example` ke `.env.local`, set `NEXT_PUBLIC_USE_MOCKS=false` dan `NEXT_PUBLIC_API_URL` ke origin backend. URL HTTPS diperlukan untuk frontend HTTPS. Nilai `NEXT_PUBLIC_*` bukan rahasia dan dibundel saat build: perubahan memerlukan restart dev/redeploy.
 
