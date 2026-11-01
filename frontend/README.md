@@ -1,6 +1,8 @@
 # GuardBit — skeleton frontend F1-I1
 
-Next.js App Router, TypeScript strict, Tailwind CSS. Lima route masih placeholder berbahasa Indonesia; belum ada formulir, login, atau tampilan bukti. Hallmark belum dipakai.
+Next.js App Router, TypeScript strict, Tailwind CSS. Halaman `/` (Cek Cepat, F2-I1) sudah interaktif; empat route lain masih placeholder berbahasa Indonesia, belum ada login atau tampilan bukti.
+
+Cek Cepat saat mock aktif: URL berisi `aman` → Aman, `blokir` → Tidak dapat diperiksa, lainnya → Terindikasi, dengan jeda 1,5 detik. Validasi URL ada di `lib/quick-check.ts`.
 
 ## Lokal
 
