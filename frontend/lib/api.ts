@@ -6,6 +6,7 @@ import {
   siteCreateRequestSchema, siteCreateResponseSchema, siteIdSchema, siteVerifyResponseSchema,
 } from "./types.ts";
 import type { QuickCheckRequest, QuickCheckStatus, SiteCreateRequest } from "./types.ts";
+import { mockScan } from "./scan.ts";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -85,11 +86,13 @@ export function startScan(id: string) {
   }, undefined, "POST");
 }
 
-export function getScan(id: string) {
+// `polls` hanya menggerakkan skenario mock (scn_running, scn_failed, scn_kosong); tidak dikirim ke backend.
+export function getScan(id: string, polls = 0) {
   scanIdSchema.parse(id);
   return request(`/scans/${id}`, scanResponseSchema, () => {
-    requireMockId(id, mocks.scan.scan_id);
-    return mocks.scan;
+    const scan = mockScan(id, polls);
+    if (!scan) throw new ApiError(404, "Data contoh tidak ditemukan.");
+    return scan;
   });
 }
 

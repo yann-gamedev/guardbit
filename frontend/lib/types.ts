@@ -121,6 +121,7 @@ export type SiteVerifyResponse = z.infer<typeof siteVerifyResponseSchema>;
 export type ScanStartResponse = z.infer<typeof scanStartResponseSchema>;
 export type ScanSummary = z.infer<typeof scanSummarySchema>;
 export type ScanPage = z.infer<typeof scanPageSchema>;
+export type ScanResponse = z.infer<typeof scanResponseSchema>;
 export type L1Evidence = z.infer<typeof l1EvidenceSchema>;
 export type L2Evidence = z.infer<typeof l2EvidenceSchema>;
 export type L3Evidence = z.infer<typeof l3EvidenceSchema>;
